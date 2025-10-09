@@ -16,7 +16,7 @@ aptitude-tools-pyqt/
 ├─ assets/                     # 스크린샷 저장 폴더
 ├─ README.md
 ├─ run_aptitude_tools.bat
-├─ run_hidden.vbs             # Windows에서 빠른 실행파일, 바로가기 만들어서 사용하면 편리하게 사용 가능
+├─ run_hidden.vbs              # Windows에서 빠른 실행파일, 바로가기로 만들면 편리하게 사용 가능 (콘솔 x)
 └─ requirements.txt
 ```
 
