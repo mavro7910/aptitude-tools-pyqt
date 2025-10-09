@@ -74,7 +74,7 @@ python main.py
 - **Language:** Python 3.10+
 - **Framework:** PyQt5 (QtWidgets)
 - **UI 구조:** QVBoxLayout / QStackedWidget 기반
-- **Modules:** math, ast (안전한 수식 평가)
+- **Modules:** math, ast (수식 계산)
 
 ---
 
