@@ -11,28 +11,51 @@ from PyQt5.QtWidgets import (
     QLineEdit, QGridLayout, QSpacerItem, QSizePolicy
 )
 
+from decimal import Decimal, getcontext, InvalidOperation
+
+# 원하는 정밀도(표시 자리수 아님)
+getcontext().prec = 10
+
+def D(x) -> Decimal:
+    # float을 바로 Decimal로 넣지 말고 문자열 경유
+    return x if isinstance(x, Decimal) else Decimal(str(x))
+
+def fmt(d: Decimal) -> str:
+    """지수표기 없이, 쓸모없는 0 제거해서 문자열화"""
+    if d.is_nan():
+        return "NaN"
+    nd = d.normalize()
+    # 정수인 경우 소수점 제거
+    if nd == nd.to_integral():
+        return format(nd.quantize(Decimal(1)), 'f')
+    return format(nd, 'f')
+
 # -------- Safe Evaluator (numbers & basic ops only) --------
 class _SafeEval(ast.NodeVisitor):
     ALLOWED_BINOPS = {
-        ast.Add: op.add,
-        ast.Sub: op.sub,
-        ast.Mult: op.mul,
-        ast.Div: op.truediv,
-        ast.FloorDiv: op.floordiv,
-        ast.Mod: op.mod,
-        ast.Pow: op.pow,
+        ast.Add: lambda a,b: a + b,
+        ast.Sub: lambda a,b: a - b,
+        ast.Mult: lambda a,b: a * b,
+        ast.Div: lambda a,b: a / b,
+        ast.FloorDiv: lambda a,b: a // b,
+        ast.Mod: lambda a,b: a % b,
+        # 거듭제곱은 지수 정수만 허용 (Decimal은 비정수 지수 미지원)
+        ast.Pow: lambda a,b: a ** int(b) if b == b.to_integral() else (_ for _ in ()).throw(ValueError("지수는 정수만 허용")),
     }
-    ALLOWED_UNARY = {ast.UAdd: op.pos, ast.USub: op.neg}
-    ALLOWED_CONSTS = (int, float)
+    ALLOWED_UNARY = {
+        ast.UAdd: lambda a: +a,
+        ast.USub: lambda a: -a,
+    }
+    ALLOWED_CONSTS = (int, float, Decimal)
 
     def visit(self, node):
         if isinstance(node, ast.Expression):
             return self.visit(node.body)
-        elif isinstance(node, ast.Num):
-            return node.n
-        elif isinstance(node, ast.Constant):
+        elif isinstance(node, ast.Num):              # Py<3.8
+            return D(node.n)
+        elif isinstance(node, ast.Constant):         # Py3.8+
             if isinstance(node.value, self.ALLOWED_CONSTS):
-                return node.value
+                return D(node.value)
             raise ValueError("숫자만 사용")
         elif isinstance(node, ast.BinOp):
             left = self.visit(node.left)
@@ -51,7 +74,7 @@ class _SafeEval(ast.NodeVisitor):
         else:
             raise ValueError("표현식 불가")
 
-def safe_eval_expr(expr: str):
+def safe_eval_expr(expr: str) -> Decimal:
     expr = (expr or "").replace("^", "**")
     tree = ast.parse(expr, mode="eval")
     return _SafeEval().visit(tree)
@@ -170,38 +193,45 @@ class Calculator(QWidget):
 
     def _square_root(self):
         expr = self.input.text().strip()
-        # 입력이 없고 직전 결과가 있으면 ans 사용
         if not expr and self._last_result is not None:
-            value = self._last_result
+            value = D(self._last_result)
         else:
             try:
-                value = float(safe_eval_expr(expr))
+                value = D(safe_eval_expr(expr))
             except Exception:
                 return  # 오류 무시
+
         if value < 0:
             return  # 음수 루트는 무시
-        result = math.sqrt(value)
+
+        try:
+            result = value.sqrt()  # Decimal sqrt
+        except InvalidOperation:
+            return
+
+        # 출력
         if self._last_result is None:
-            self.output.setPlainText(str(result))
+            self.output.setPlainText(fmt(result))
         else:
-            self.output.setPlainText(f"ans = {self._last_result}\n√({value})={result}")
+            self.output.setPlainText(f"ans = {fmt(D(self._last_result))}\n√({fmt(value)})={fmt(result)}")
         self._last_result = result
         self.input.clear()
         self.input.setFocus()
+
 
     def _equals(self):
         expr = self.input.text().strip()
         if not expr:
             return
         try:
-            result = safe_eval_expr(expr)
+            result = safe_eval_expr(expr)   # Decimal
         except Exception:
-            # 오류는 무시
-            return
+            return  # 오류는 무반응
+
         if self._last_result is None:
-            self.output.setPlainText(str(result))
+            self.output.setPlainText(fmt(result))
         else:
-            self.output.setPlainText(f"ans = {self._last_result}\n{expr}={result}")
+            self.output.setPlainText(f"ans = {fmt(D(self._last_result))}\n{expr}={fmt(result)}")
         self._last_result = result
         self.input.clear()
         self.input.setFocus()
