@@ -15,7 +15,8 @@ aptitude-tools-pyqt/
 │  └─ notes_paint.py           # 메모장 및 그림판 위젯
 ├─ assets/                     # 스크린샷 저장 폴더
 ├─ README.md
-├─ run_aptitude_tools          # 윈도우 실행파일
+├─ run_aptitude_tools
+├─ run_hidden.vbs             # 윈도우 실행파일
 └─ requirements.txt
 ```
 
@@ -65,6 +66,8 @@ pip install -r requirements.txt
 ```bash
 python main.py
 ```
+
+**Windows**에서는 `run_hidden.vbs`를 실행하면 바로 사용 가능합니다.
 
 > 실행 시 **상단 영역**은 메모장/그림판 전환용,  
 > **하단 영역**은 계산기로 구성됩니다.
