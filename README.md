@@ -15,6 +15,7 @@ aptitude-tools-pyqt/
 │  └─ notes_paint.py           # 메모장 및 그림판 위젯
 ├─ assets/                     # 스크린샷 저장 폴더
 ├─ README.md
+├─ run_aptitude_tools          # 윈도우 실행파일
 └─ requirements.txt
 ```
 
