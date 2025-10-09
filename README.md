@@ -1,6 +1,7 @@
-# aptitude-tools-pyqt
-인적성 시험 연습을 위한 **계산기 + 메모장 + 그림판** 통합 데스크탑 도구입니다.
 # 🧮 Aptitude Tools (PyQt5)
+
+인적성 시험 연습을 위한 **계산기 + 메모장 + 그림판** 통합 데스크탑 도구입니다.
+
 ---
 
 ## 📁 Project Structure
@@ -9,11 +10,10 @@
 aptitude-tools-pyqt/
 ├─ main.py                     # 실행 파일 (entry point)
 ├─ gui/
-│  ├─ __init__.py              # 패키지 인식용
 │  ├─ gui.py                   # 메인 윈도우 (UI 조합)
 │  ├─ calculator.py            # 계산기 위젯
 │  └─ notes_paint.py           # 메모장 및 그림판 위젯
-├─ assets/                     # (선택) 스크린샷 저장 폴더
+├─ assets/                     # 스크린샷 저장 폴더
 ├─ README.md
 └─ requirements.txt
 ```
