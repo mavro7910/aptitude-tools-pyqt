@@ -15,8 +15,8 @@ aptitude-tools-pyqt/
 │  └─ notes_paint.py           # 메모장 및 그림판 위젯
 ├─ assets/                     # 스크린샷 저장 폴더
 ├─ README.md
-├─ run_aptitude_tools
-├─ run_hidden.vbs             # 윈도우 실행파일
+├─ run_aptitude_tools.bat
+├─ run_hidden.vbs             # Windows에서 빠른 실행파일, 바로가기 만들어서 사용하면 편리하게 사용 가능
 └─ requirements.txt
 ```
 
