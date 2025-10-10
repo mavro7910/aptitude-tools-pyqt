@@ -11,12 +11,13 @@ aptitude-tools-pyqt/
 ├─ main.py                     # 실행 파일 (entry point)
 ├─ gui/
 │  ├─ gui.py                   # 메인 윈도우 (UI 조합)
+│  ├─ timer.py                 # 타이머 위젯
 │  ├─ calculator.py            # 계산기 위젯
 │  └─ notes_paint.py           # 메모장 및 그림판 위젯
 ├─ assets/                     # 스크린샷 저장 폴더
 ├─ README.md
 ├─ run_aptitude_tools.bat
-├─ run_hidden.vbs              # Windows에서 빠른 실행파일, 바로가기로 만들면 편리하게 사용 가능 (콘솔 x)
+├─ run_hidden.vbs              # Windows에서 빠른 실행파일
 └─ requirements.txt
 ```
 
@@ -32,19 +33,19 @@ aptitude-tools-pyqt/
 | 🔄 **모드 전환** | 상단에서 메모장 ↔ 그림판 전환 가능 |
 | 🧹 **전체 지우기 버튼** | 현재 활성 탭의 모든 내용을 한 번에 초기화 |
 | 💡 **편의 기능** | CE, C, ⌫, ±, 00, √ 등 인적성 스타일 버튼 구성 |
-| 🧠 **√(루트) 기능** | 현재 입력 값 또는 직전 결과(ans)의 제곱근을 즉시 계산 |
+| 🧠 **타이머 기능** | 시험 시간에 맞게 타이머 제공 |
 
 ---
 
 ## 🖼️ Screenshots
 
-### 🧾 Notepad + Calculator
-![Notepad + Calculator](./assets/notepad_calculator.png)
+### 🧾 Timer + Notepad + Calculator
+![Timer + Notepad + Calculator](./assets/notepad_calculator.jpg)
 
 ---
 
-### 🎨 Paint + Calculator
-![Paint + Calculator](./assets/paint_calculator.png)
+### 🎨 Timer + Paint + Calculator
+![Timer + Paint + Calculator](./assets/paint_calculator.jpg)
 ---
 
 ## ⚙️ Installation
