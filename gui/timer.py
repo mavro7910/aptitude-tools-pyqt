@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
 )
 
 import winsound
+import time
 
 def _fmt(sec: int) -> str:
     sec = max(0, sec)
@@ -135,7 +136,9 @@ class TimerWidget(QWidget):
             self.timer.stop()
             self._running = False
             self.edit.setEnabled(True)
-            winsound.Beep(1000, 400)
+            for _ in range(3):
+                winsound.Beep(1000, 400)
+                time.sleep(0.05)
         self._render()
 
     def _render(self):

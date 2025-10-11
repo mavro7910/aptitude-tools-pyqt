@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import math
 import ast
-import operator as op
+from decimal import Decimal, getcontext, InvalidOperation
 
 from PyQt5.QtCore import Qt, QObject, QEvent
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QPlainTextEdit, QVBoxLayout,
-    QLineEdit, QGridLayout, QSpacerItem, QSizePolicy
+    QLineEdit, QGridLayout, QSizePolicy
 )
-
-from decimal import Decimal, getcontext, InvalidOperation
 
 # 원하는 정밀도(표시 자리수 아님)
 getcontext().prec = 10
@@ -83,7 +80,7 @@ def safe_eval_expr(expr: str) -> Decimal:
 class Calculator(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._last_result = None  # 직전 결과
+        self._last_result: Decimal | None = None  # 직전 결과
 
         layout = QVBoxLayout()
         layout.setContentsMargins(8, 8, 8, 8)
@@ -103,7 +100,7 @@ class Calculator(QWidget):
         self.input.setFixedHeight(36)
         layout.addWidget(self.input)
 
-        # Keypad (aptitude-like)
+        # Keypad (aptitude-like) with '=' inside the grid
         grid = QGridLayout()
         grid.setSpacing(6)
         buttons = [
@@ -111,7 +108,7 @@ class Calculator(QWidget):
             ("7", 1, 0), ("8", 1, 1), ("9", 1, 2), ("/", 1, 3),
             ("4", 2, 0), ("5", 2, 1), ("6", 2, 2), ("*", 2, 3),
             ("1", 3, 0), ("2", 3, 1), ("3", 3, 2), ("-", 3, 3),
-            ("±", 4, 0), ("0", 4, 1), ("00", 4, 2), ("+", 4, 3),
+            (".", 4, 0), ("0", 4, 1), ("=", 4, 2), ("+", 4, 3),
         ]
         for text, r, c in buttons:
             btn = QPushButton(text)
@@ -126,19 +123,12 @@ class Calculator(QWidget):
                 btn.clicked.connect(self._backspace)
             elif text == "√":
                 btn.clicked.connect(self._square_root)
-            elif text == "±":
-                btn.clicked.connect(self._toggle_sign)
+            elif text == "=":
+                btn.clicked.connect(self._equals)
             else:
                 btn.clicked.connect(lambda checked, t=text: self._insert(t))
 
-        # Big "="
-        self.btn_eq = QPushButton("=")
-        self.btn_eq.setMinimumHeight(44)
-        self.btn_eq.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.btn_eq.clicked.connect(self._equals)
-
         layout.addLayout(grid)
-        layout.addWidget(self.btn_eq)
 
         self.setLayout(layout)
         self.installEventFilter(self)  # click anywhere -> focus input
@@ -162,6 +152,12 @@ class Calculator(QWidget):
 
     # -------- Button helpers --------
     def _insert(self, t: str):
+        if t == ".":
+            cur = self.input.text()
+            if not cur or cur[-1] in "+-*/":
+                self.input.insert("0.")
+                self.input.setFocus()
+                return
         self.input.insert(t)
         self.input.setFocus()
 
@@ -181,20 +177,10 @@ class Calculator(QWidget):
             self.input.setText(cur[:-1])
         self.input.setFocus()
 
-    def _toggle_sign(self):
-        txt = self.input.text().strip()
-        if not txt:
-            self.input.setText("-")
-            return
-        if txt.startswith("-"):
-            self.input.setText(txt[1:])
-        else:
-            self.input.setText("-" + txt)
-
     def _square_root(self):
         expr = self.input.text().strip()
         if not expr and self._last_result is not None:
-            value = D(self._last_result)
+            value = self._last_result
         else:
             try:
                 value = D(safe_eval_expr(expr))
@@ -211,27 +197,54 @@ class Calculator(QWidget):
 
         # 출력
         if self._last_result is None:
-            self.output.setPlainText(fmt(result))
+            self.output.setPlainText(f"√({fmt(value)})={fmt(result)}")
         else:
-            self.output.setPlainText(f"ans = {fmt(D(self._last_result))}\n√({fmt(value)})={fmt(result)}")
+            self.output.setPlainText(f"ans = {fmt(self._last_result)}\n√({fmt(value)})={fmt(result)}")
         self._last_result = result
         self.input.clear()
         self.input.setFocus()
 
-
     def _equals(self):
-        expr = self.input.text().strip()
+        raw = self.input.text().strip()
+        expr = self._prepare_expr(raw)
         if not expr:
             return
         try:
-            result = safe_eval_expr(expr)   # Decimal
+            result = safe_eval_expr(expr)   # Decimal 반환
         except Exception:
             return  # 오류는 무반응
 
         if self._last_result is None:
-            self.output.setPlainText(fmt(result))
+            # 첫 결과
+            self.output.setPlainText(f"{expr} = {fmt(result)}")
         else:
-            self.output.setPlainText(f"ans = {fmt(D(self._last_result))}\n{expr}={fmt(result)}")
+            # ans 체인 표시
+            self.output.setPlainText(f"Ans = {fmt(self._last_result)}\n{expr} = {fmt(result)}")
         self._last_result = result
         self.input.clear()
         self.input.setFocus()
+
+    def _prepare_expr(self, expr: str | None):
+        """연속 계산을 위해, 연산자로 시작하면 ans를 앞에 붙인다.
+        단, 직전 결과가 없을 때는 음수 입력(-3 등)은 그대로 계산."""
+        if not expr:
+            return None
+
+        first = expr[0]
+
+        # 사칙연산으로 시작하는 경우 (연속 계산)
+        if first in "+-*/":
+            # 직전 결과가 없는 경우
+            if self._last_result is None:
+                # '-' 뒤가 숫자면 음수 입력으로 판단 → 그대로 반환
+                if first == "-" and len(expr) > 1 and expr[1].isdigit():
+                    return expr
+                # '+' 뒤가 숫자면 양수 입력으로 판단 → 그대로 반환
+                if first == "+" and len(expr) > 1 and expr[1].isdigit():
+                    return expr
+                return None  # ans 없음 + 연산자 시작 → 무시
+            # 직전 결과 존재 → ans 붙이기
+            return f"{fmt(self._last_result)}{expr}"
+
+        # 그 외 일반 수식은 그대로 반환
+        return expr
