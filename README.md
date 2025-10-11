@@ -4,6 +4,12 @@
 
 ---
 
+## 📦 Download
+최신 실행 파일은 아래 링크에서 다운로드할 수 있습니다.  
+[⬇️ Download Aptitude Tools v1.0.0](https://github.com/mavro7910/aptitude-tools-pyqt/releases/latest)
+
+---
+
 ## 📁 Project Structure
 
 ```
@@ -101,7 +107,6 @@ deactivate
 ```
 
 ---
-
 
 실행 시 **상단 영역**은 메모장/그림판 전환용,  
 **하단 영역**은 계산기로 구성됩니다.
