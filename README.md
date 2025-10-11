@@ -1,6 +1,6 @@
 # 🧮 Aptitude Tools (PyQt5)
 
-인적성 시험 연습을 위한 **계산기 + 메모장 + 그림판** 통합 데스크탑 도구입니다.
+인적성 시험 연습을 위한 **계산기 + 메모장 + 그림판 + 타이머** 통합 데스크탑 도구입니다.
 
 ---
 
@@ -40,12 +40,12 @@ aptitude-tools-pyqt/
 ## 🖼️ Screenshots
 
 ### 🧾 Timer + Notepad + Calculator
-![Timer + Notepad + Calculator](./assets/notepad_calculator.jpg)
+![Timer + Notepad + Calculator](./assets/notepad_calculator_251011.jpg)
 
 ---
 
 ### 🎨 Timer + Paint + Calculator
-![Timer + Paint + Calculator](./assets/paint_calculator.jpg)
+![Timer + Paint + Calculator](./assets/paint_calculator_251011.jpg)
 ---
 
 ## ⚙️ Installation
