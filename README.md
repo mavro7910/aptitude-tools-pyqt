@@ -8,17 +8,18 @@
 
 ```
 aptitude-tools-pyqt/
-├─ main.py                     # 실행 파일 (entry point)
+├─ assets/
+│ ├─ app_icon.ico # 빌드용 아이콘
+│ ├─ screenshots/
 ├─ gui/
-│  ├─ gui.py                   # 메인 윈도우 (UI 조합)
-│  ├─ timer.py                 # 타이머 위젯
-│  ├─ calculator.py            # 계산기 위젯
-│  └─ notes_paint.py           # 메모장 및 그림판 위젯
-├─ assets/                     # 스크린샷 저장 폴더
-├─ README.md
-├─ run_aptitude_tools.bat
-├─ run_hidden.vbs              # Windows에서 빠른 실행파일
-└─ requirements.txt
+│ ├─ init.py
+│ ├─ gui.py # 전체 레이아웃
+│ ├─ calculator.py # 계산기
+│ ├─ notes_paint.py # 메모장/그림판
+│ └─ timer.py # 타이머
+├─ main.py # 진입점
+├─ requirements.txt
+└─ README.md
 ```
 
 ---
@@ -39,13 +40,15 @@ aptitude-tools-pyqt/
 
 ## 🖼️ Screenshots
 
+![app_icon](./assets/app_icon.ico)
+
 ### 🧾 Timer + Notepad + Calculator
-![Timer + Notepad + Calculator](./assets/notepad_calculator_251011.jpg)
+![Timer + Notepad + Calculator](./assets/screenshots/notepad_calculator_251011.jpg)
 
 ---
 
 ### 🎨 Timer + Paint + Calculator
-![Timer + Paint + Calculator](./assets/paint_calculator_251011.jpg)
+![Timer + Paint + Calculator](./assets/screenshots/paint_calculator_251011.jpg)
 ---
 
 ## ⚙️ Installation
@@ -68,10 +71,40 @@ pip install -r requirements.txt
 python main.py
 ```
 
-**Windows**에서는 `run_hidden.vbs`를 실행하면 바로 사용 가능합니다.
+**Windows**에서는 `run_hidden.vbs`를 실행하면 빌드 없이 바로 사용 가능합니다.
 
-> 실행 시 **상단 영역**은 메모장/그림판 전환용,  
-> **하단 영역**은 계산기로 구성됩니다.
+
+## ⚙️ Build (Windows .exe 빌드)
+
+```bash
+#./aptitude-tools-pyqt에서...
+
+# 1️⃣ 새 가상환경 생성
+python -m venv .venv
+
+# 2️⃣ 활성화
+.venv\Scripts\activate
+
+# 3️⃣ 필요한 패키지 설치
+pip install -U pip setuptools wheel
+pip install -r requirements.txt
+
+# 4️⃣ exe 빌드
+pyinstaller --noconsole --onefile --clean `
+  --icon assets/app_icon.ico `
+  main.py
+
+# 5️⃣ 가상환경 비활성화 (혹시 켜져 있다면)
+deactivate
+
+#./dist에 build된 main.exe 사용 가능
+```
+
+---
+
+
+실행 시 **상단 영역**은 메모장/그림판 전환용,  
+**하단 영역**은 계산기로 구성됩니다.
 
 ---
 
@@ -79,7 +112,7 @@ python main.py
 - **Language:** Python 3.10+
 - **Framework:** PyQt5 (QtWidgets)
 - **UI 구조:** QVBoxLayout / QStackedWidget 기반
-- **Modules:** math, ast (수식 계산)
+- **Modules:** decimal, ast (수식 계산)
 
 ---
 
