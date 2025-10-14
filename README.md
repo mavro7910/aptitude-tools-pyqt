@@ -6,7 +6,7 @@
 
 ## 📦 Download
 최신 실행 파일은 아래 링크에서 다운로드할 수 있습니다.  
-[⬇️ Download Aptitude Tools v1.0.0](https://github.com/mavro7910/aptitude-tools-pyqt/releases/latest)
+[⬇️ Download Aptitude Tools v1.0.1](https://github.com/mavro7910/aptitude-tools-pyqt/releases/latest)
 
 ---
 
