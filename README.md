@@ -16,6 +16,7 @@
 aptitude-tools-pyqt/
 ├─ assets/
 │ ├─ app_icon.ico # 빌드용 아이콘
+│ ├─ beep.wav # 타임 종료 사운드
 │ ├─ screenshots/
 ├─ gui/
 │ ├─ init.py
@@ -96,8 +97,11 @@ pip install -U pip setuptools wheel
 pip install -r requirements.txt
 
 # 4️⃣ exe 빌드
-pyinstaller --noconsole --onefile --clean `
-  --icon assets/app_icon.ico `
+pyinstaller --noconsole --onefile ^
+  --name "AptitudeTools" ^
+  --add-data "assets;assets" ^
+  --hidden-import PyQt5.QtMultimedia ^
+  --collect-submodules PyQt5.QtMultimedia ^
   main.py
 
 # 5️⃣ 가상환경 비활성화 (혹시 켜져 있다면)

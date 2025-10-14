@@ -2,13 +2,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from PyQt5.QtCore import QTimer, Qt
+import sys, os
+from pathlib import Path
+
+import re
+MMSS_RE = re.compile(r"^\s*(\d{1,3})(?::([0-5]?\d))?\s*$")
+
+from PyQt5.QtCore import QTimer, Qt, QUrl
 from PyQt5.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QPushButton
 )
 
-import winsound
-import time
+from PyQt5.QtMultimedia import QSoundEffect
 
 def _fmt(sec: int) -> str:
     sec = max(0, sec)
@@ -20,11 +25,17 @@ def _parse_mmss(text: str) -> int:
     text = text.strip()
     if not text:
         return 0
-    if ":" in text:
-        m, s = text.split(":", 1)
-        return int(m) * 60 + int(s)
-    return int(text)
+    m = MMSS_RE.match(text)
+    if not m:
+        raise ValueError("시간 형식은 MM:SS 또는 초(정수)입니다.")
+    mm = int(m.group(1))
+    ss = int(m.group(2) or 0)
+    return mm * 60 + ss
 
+def resource_path(rel: str) -> str:
+    # PyInstaller(onefile)로 돌 때는 _MEIPASS 사용, 개발 환경은 소스 기준
+    base = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent))
+    return str((base / rel).resolve())
 
 class TimerWidget(QWidget):
     """
@@ -97,21 +108,45 @@ class TimerWidget(QWidget):
         self.btn_start.clicked.connect(self.start)
         self.btn_pause.clicked.connect(self.pause)
         self.btn_reset.clicked.connect(self.reset)
+        
+        # 비프 사운드
+        wav_path = resource_path("assets/beep.wav")   # 프로젝트루트/assets/beep.wav
+        self._beep = QSoundEffect(self)
+        self._beep.setSource(QUrl.fromLocalFile(wav_path))
+        self._beep.setVolume(0.8)
+        self._beep.setLoopCount(1) 
 
     # --- 동작 로직 ---
     def start(self):
+        if self._running:
+            return
+
         try:
-            if not self._running:
-                if self._remaining <= 0:
-                    self._remaining = _parse_mmss(self.edit.text())
-                if self._remaining <= 0:
-                    return
-                self._running = True
-                self.edit.setEnabled(False)
-                self.timer.start()
-                self._render()
-        except Exception:
-            pass
+            # 남은 시간이 0이면 입력값 파싱
+            if self._remaining <= 0:
+                self._remaining = _parse_mmss(self.edit.text())
+
+            # 0초면 시작 안 함
+            if self._remaining <= 0:
+                return
+
+        except ValueError:
+            # 형식 오류: 테두리 빨강 + 포커스/선택
+            self.edit.setStyleSheet("QLineEdit { border:1px solid #d9534f; }")
+            self.edit.setToolTip("시간 형식은 MM:SS 또는 초(정수)입니다.")
+            self.edit.setFocus()
+            self.edit.selectAll()
+            return
+        else:
+            # 정상: 테두리 원복
+            self.edit.setStyleSheet("")
+            self.edit.setToolTip("")
+
+        # 타이머 시작
+        self._running = True
+        self.edit.setEnabled(False)
+        self.timer.start()
+        self._render()
 
     def pause(self):
         if self._running:
@@ -136,18 +171,15 @@ class TimerWidget(QWidget):
             self.timer.stop()
             self._running = False
             self.edit.setEnabled(True)
-            for _ in range(3):
-                winsound.Beep(1000, 400)
-                time.sleep(0.05)
+            self._beep.play()
         self._render()
 
     def _render(self):
         self.lbl_show.setText(_fmt(self._remaining))
-        self.lbl_show.setStyleSheet(
-            "font-size:18px; font-weight:600; color:{};".format(
-                "#d9534f" if self._running else "#222"
-            )
-        )
+        color = "#222"
+        if self._running:
+            color = "#d9534f" if self._remaining <= 10 else "#222"
+        self.lbl_show.setStyleSheet(f"font-size:18px; font-weight:600; color:{color};")
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Space:
