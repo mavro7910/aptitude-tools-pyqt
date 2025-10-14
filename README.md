@@ -47,7 +47,7 @@ aptitude-tools-pyqt/
 
 ## 🖼️ Screenshots
 
-![app_icon](./assets/app_icon.ico)
+![app_icon](./assets/app_icon.ic)
 
 ### 🧾 Timer + Notepad + Calculator
 ![Timer + Notepad + Calculator](./assets/screenshots/notepad_calculator_251011.jpg)
