@@ -75,34 +75,38 @@ pip install -r requirements.txt
 
 ## 🚀 Run
 ```bash
+#./aptitude-tools-pyqt/
 python main.py
 ```
-
-**Windows**에서는 `run_hidden.vbs`를 실행하면 빌드 없이 바로 사용 가능합니다.
 
 
 ## ⚙️ Build (Windows .exe 빌드)
 
 ```bash
-#./aptitude-tools-pyqt에서...
+#./aptitude-tools-pyqt/
 
 # 1️⃣ 새 가상환경 생성
 python -m venv .venv
+```
 
-# 2️⃣ 활성화
+```bash
+# 2️⃣ 가상환경 활성화
 .venv\Scripts\activate
-
+```
+```bash
 # 3️⃣ 필요한 패키지 설치
 pip install -U pip setuptools wheel
 pip install -r requirements.txt
+```
 
+```bash
 # 4️⃣ exe 빌드
 pyinstaller --noconsole --onefile --clean --name "AptitudeTools" --icon "assets/app_icon.ico" --add-data "assets;assets" --hidden-import PyQt5.QtMultimedia --collect-submodules PyQt5.QtMultimedia main.py
+```
 
-
+```bash
 # 5️⃣ 가상환경 비활성화 (혹시 켜져 있다면)
 deactivate
-
 #./dist에 build된 main.exe 사용 가능
 ```
 
