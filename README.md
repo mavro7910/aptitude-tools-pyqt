@@ -25,6 +25,7 @@ aptitude-tools-pyqt/
 │ ├─ notes_paint.py # 메모장/그림판
 │ └─ timer.py # 타이머
 ├─ main.py # 진입점
+├─ build_version.py # 빌드용 버전 정보
 ├─ requirements.txt
 └─ README.md
 ```
@@ -50,12 +51,12 @@ aptitude-tools-pyqt/
 ![app_icon](./assets/app_icon.ico)
 
 ### 🧾 Timer + Notepad + Calculator
-![Timer + Notepad + Calculator](./assets/screenshots/notepad_calculator_251011.jpg)
+![Timer + Notepad + Calculator](./assets/screenshots/notepad_calculator_251016.jpg)
 
 ---
 
 ### 🎨 Timer + Paint + Calculator
-![Timer + Paint + Calculator](./assets/screenshots/paint_calculator_251011.jpg)
+![Timer + Paint + Calculator](./assets/screenshots/paint_calculator_251016.jpg)
 ---
 
 ## ⚙️ Installation
@@ -84,7 +85,12 @@ python main.py
 
 ```bash
 #./aptitude-tools-pyqt/
+# 기존에 빌드한 파일이 있다면...
+Remove-Item -Recurse -Force .venv, build, dist
+Remove-Item -Force *.spec
+```
 
+```bash
 # 1️⃣ 새 가상환경 생성
 python -m venv .venv
 ```
@@ -93,21 +99,22 @@ python -m venv .venv
 # 2️⃣ 가상환경 활성화
 .venv\Scripts\activate
 ```
+
 ```bash
 # 3️⃣ 필요한 패키지 설치
-pip install -U pip setuptools wheel
+pip install -U pip setuptools wheel  # ERROR: To modify pip, please run the following command: 에러 발생 시 에러 내용 하단 명령어로 재설치
 pip install -r requirements.txt
 ```
 
 ```bash
 # 4️⃣ exe 빌드
-pyinstaller --noconsole --onefile --clean --name "AptitudeTools" --icon "assets/app_icon.ico" --add-data "assets;assets" --hidden-import PyQt5.QtMultimedia --collect-submodules PyQt5.QtMultimedia main.py
+python build_version.py; pyinstaller --noconsole --onefile --clean --name "AptitudeTools" --icon "assets/app_icon.ico" --add-data "assets;assets" --version-file "version_file.txt" main.py
 ```
 
 ```bash
-# 5️⃣ 가상환경 비활성화 (혹시 켜져 있다면)
+# 5️⃣ 가상환경 비활성화
 deactivate
-#./dist에 build된 main.exe 사용 가능
+#./dist에 build된 AptitudeTools.exe 사용 가능
 ```
 
 ---

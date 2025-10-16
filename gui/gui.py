@@ -5,13 +5,13 @@ from .timer import TimerWidget
 from .notes_paint import TopArea
 from .calculator import Calculator
 
-APP_TITLE = "Aptitude Tools (PyQt5)"
+APP_TITLE = "Aptitude Tools (PyQt5) v1.0.2"
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(APP_TITLE)
-        self.resize(400, 900)
+        self.resize(400, 800)
 
         main = QVBoxLayout(self)
         main.setContentsMargins(8, 8, 8, 8)
@@ -27,8 +27,8 @@ class MainWindow(QWidget):
         line1 = QFrame(); line1.setFrameShape(QFrame.HLine); line1.setFrameShadow(QFrame.Sunken)
         main.addWidget(line1)
 
-        main.addWidget(self.top_area, stretch=2)
+        main.addWidget(self.top_area, stretch=1)
         line2 = QFrame(); line2.setFrameShape(QFrame.HLine); line2.setFrameShadow(QFrame.Sunken)
         main.addWidget(line2)
 
-        main.addWidget(self.calc, stretch=3)
+        main.addWidget(self.calc, stretch=1)
